@@ -3,13 +3,17 @@ import {
   getAllProducts,
   createProduct,
 } from "../controllers/productController";
+import { productValidation } from '../middlewares/validation';
+
+
+const productRoutes = Router();
+productRoutes.get("/product", getAllProducts);
+productRoutes.post("/product", productValidation, createProduct);
+
+export default productRoutes;
+
+
 import Product from '../models/products';
-
-const router = Router();
-router.get("/product", getAllProducts);
-router.post("/product", createProduct);
-
-
 router.get('/product', async (req, res) => {
     try {
         const products = await Product.find(); 
@@ -25,4 +29,4 @@ router.get('/product', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-export default router;
+
