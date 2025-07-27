@@ -1,4 +1,5 @@
-import Joi, { celebrate } from "celebrate";
+import Joi from "joi";
+import { celebrate } from "celebrate";
 import { Types } from "mongoose";
 
 enum PaymentType {
@@ -6,7 +7,7 @@ enum PaymentType {
   Online = "online",
 }
 
-export const validateProductBody = celebrate({
+export const productValidation = celebrate({
   body: Joi.object({
     title: Joi.string()
       .min(2)
@@ -21,7 +22,7 @@ export const validateProductBody = celebrate({
     image: Joi.object()
       .required()
       .messages({
-        'any.required': 'Поле image должно быть заполнено',
+        'object.base': 'Поле image должно быть заполнено'
       })
       .keys({
         fileName: Joi.string()
@@ -48,20 +49,27 @@ export const validateProductBody = celebrate({
         'string.empty': 'Поле description должно быть заполнено',
       }),
 
-    price: Joi.number().allow(null),
+    price: Joi.number().allow(null)
+      .messages({
+        'number.base': 'Поле price должно быть числом',
+      }),
   }),
 });
 
-export const validateOrderBody = celebrate({
-    body: Joi.object().keys({
-      items: Joi.array()
-        .items(
-          Joi.string().custom((value, helpers) => {
-            if (Types.ObjectId.isValid(value)) {
-              return value;
-            }
-            return helpers.message({ custom: "Невалидный id" });
-          })
-        )
-    }),
-  });
+export const orderValidation = celebrate({
+  body: Joi.object().keys({
+    items: Joi.array()
+      .items(
+        Joi.string().custom((value, helpers) => {
+          if (Types.ObjectId.isValid(value)) {
+            return value;
+          }
+          return helpers.message('');
+        })
+      )
+      .required()
+      .messages({
+        'array.base': 'Поле items должно быть массивом'
+      })
+  }),
+});

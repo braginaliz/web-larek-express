@@ -1,28 +1,29 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import productRoutes from "./routes/productRoutes";
+import routers from "./routes/productRoutes";
 import path from 'path';
-
+import { errorHandler } from "./middlewares/errorhandler"; 
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors()); 
+
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use("/api", productRoutes);
+app.use("/api", routers);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 const bootstrap = async () => {
   try {
     await mongoose.connect('mongodb://127.0.0.1:27017/weblarek');
-    app.use(routers);
-    await app.listen(PORT, () => console.log('ok'));
+    app.use(errorHandler); 
+    await app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
   } catch (error) {
-    console.error(error);
+    console.error('MongoDB connection error:', error);
   }
 };
 
