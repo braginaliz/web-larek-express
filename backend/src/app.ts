@@ -1,30 +1,48 @@
-import express from "express";
-import mongoose from "mongoose";
-import bodyParser from "body-parser";
-import routers from "./routes/mainRouter";
-import path from 'path';
-import { errorHandler } from "./middlewares/errorhandler"; 
+import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
+import path from 'path';
+import { errors } from 'celebrate';
+import productRoutes from './routes/productRoutes';
+import orderRoutes from './routes/orderRoutes';
+import {errorHandler} from './middlewares/errorhandler';
+import NotFoundError from './errors/not-found-error';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import { PORT, DB_ADDRESS } from './config';
 
 const app = express();
-
-app.use(cors()); 
-
-const PORT = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-app.use("/api", routers);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public'))); 
 
 
-const bootstrap = async () => {
-  try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/weblarek');
-    app.use(errorHandler); 
-    await app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-  }
-};
+app.use(requestLogger);
 
-bootstrap();
+
+app.use('/product', productRoutes);
+app.use('/order', orderRoutes);
+
+
+app.use('*', (_req, _res, next) => {
+  next(new NotFoundError('Не найден маршрут'));
+});
+
+
+app.use(errorLogger);
+
+
+app.use(errors());
+app.use(errorHandler);
+
+
+mongoose.connect(DB_ADDRESS)
+  .then(() => {
+    console.log('Успешно подключение к MongoDB');
+  })
+  .catch((error) => {
+    console.error('Ошибка подключения к MongoDB:', error);
+  });
+
+app.listen(PORT, () => {
+  console.log(`Запускается на сервере: ${PORT}`);
+});
