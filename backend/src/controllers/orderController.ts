@@ -12,16 +12,34 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         const products = await Product.find<IProduct>({});
         const { total, items } = req.body;
 
-        items.forEach((id: Types.ObjectId) => {
+
+        for (const id of items) {
             const product = products.find((p) => p._id.equals(id));
             if (!product) {
                 return next(new BadRequestError(`Товар с id ${id} не найден`));
             }
+            if (product.price === null) {
+                return next(new BadRequestError(`Товар с id ${id} снят с продажи`));
+            }
             basket.push(product);
-        });
+        }
 
-        return res.status(HttpCodes.CREATED).send({ total, items: basket });
+
+        const totalBasket = basket.reduce((a, c) => a + c.price, 0);
+        if (totalBasket !== total) {
+            return next(new BadRequestError('Неверная сумма заказа'));
+        }
+
+
+        return res.status(HttpCodes.CREATED).json({
+            id: faker.string.uuid(),
+            total,
+            items: basket,
+        });
     } catch (error) {
-        return next(new BadRequestError('Ошибка при создании заказа', error));
+        if (error instanceof MongooseError.ValidationError) {
+            return next(new BadRequestError(error.message));
+        }
+        return next(new BadRequestError('Ошибка при создании заказа'));
     }
 };

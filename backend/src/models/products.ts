@@ -6,7 +6,7 @@ export interface IProduct extends Document {
     image: { fileName: string; originalName: string };
     category: string;
     description?: string;
-    price?: number | null;
+    price: number;
 }
 
 const productSchema = new mongoose.Schema<IProduct>({

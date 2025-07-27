@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import routers from "./routes/productRoutes";
+import routers from "./routes/mainRouter";
 import path from 'path';
 import { errorHandler } from "./middlewares/errorhandler"; 
 import cors from 'cors';

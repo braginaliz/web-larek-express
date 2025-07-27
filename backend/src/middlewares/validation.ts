@@ -64,12 +64,41 @@ export const orderValidation = celebrate({
           if (Types.ObjectId.isValid(value)) {
             return value;
           }
-          return helpers.message('');
+          return helpers.message({custom:'id invalid'});
         })
       )
       .required()
       .messages({
         'array.base': 'Поле items должно быть массивом'
-      })
-  }),
-});
+      }),
+      payment: Joi.string()
+        .valid(...Object.values(PaymentType))
+        .required()
+        .messages({
+            "string.valid": `Указано не валидное значение для способа оплаты, возможные значения - "card", "online"`,
+            "any.required": "Не указан способ оплаты",
+        }),
+    email: Joi.string()
+        .email()
+        .required()
+        .messages({
+            "any.required": "Не указан email",
+        }),
+    phone: Joi.string()
+        .required()
+        .messages({
+            "any.required": "Не указан телефон",
+        }),
+    address: Joi.string()
+        .required()
+        .messages({
+            "any.required": "Не указан адрес",
+        }),
+    total: Joi.number()
+        .required()
+        .messages({
+            "any.required": "Не указана сумма заказа",
+        }),
+})
+
+  })
