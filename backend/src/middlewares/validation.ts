@@ -1,10 +1,10 @@
-import Joi from "joi";
-import { celebrate } from "celebrate";
-import { Types } from "mongoose";
+import Joi from 'joi';
+import { celebrate } from 'celebrate';
+import { Types } from 'mongoose';
 
 enum PaymentType {
-  Card = "card",
-  Online = "online",
+  Card = 'card',
+  Online = 'online',
 }
 
 export const productValidation = celebrate({
@@ -18,11 +18,11 @@ export const productValidation = celebrate({
         'string.max': 'Максимальная длина поля title - 30',
         'any.required': 'Поле title должно быть заполнено',
       }),
-    
+
     image: Joi.object()
       .required()
       .messages({
-        'object.base': 'Поле image должно быть заполнено'
+        'object.base': 'Поле image должно быть заполнено',
       })
       .keys({
         fileName: Joi.string()
@@ -42,7 +42,7 @@ export const productValidation = celebrate({
       .messages({
         'string.empty': 'Поле category должно быть заполнено',
       }),
-    
+
     description: Joi.string()
       .required()
       .messages({
@@ -64,41 +64,41 @@ export const orderValidation = celebrate({
           if (Types.ObjectId.isValid(value)) {
             return value;
           }
-          return helpers.message({custom:'id invalid'});
-        })
+          return helpers.message({ custom: 'id invalid' });
+        }),
       )
       .required()
       .messages({
-        'array.base': 'Поле items должно быть массивом'
+        'array.base': 'Поле items должно быть массивом',
       }),
-      payment: Joi.string()
-        .valid(...Object.values(PaymentType))
-        .required()
-        .messages({
-            "string.valid": `Указано не валидное значение для способа оплаты, возможные значения - "card", "online"`,
-            "any.required": "Не указан способ оплаты",
-        }),
+    payment: Joi.string()
+      .valid(...Object.values(PaymentType))
+      .required()
+      .messages({
+        'string.valid': 'Указано не валидное значение для способа оплаты, возможные значения - "card", "online"',
+        'any.required': 'Не указан способ оплаты',
+      }),
     email: Joi.string()
-        .email()
-        .required()
-        .messages({
-            "any.required": "Не указан email",
-        }),
+      .email()
+      .required()
+      .messages({
+        'any.required': 'Не указан email',
+      }),
     phone: Joi.string()
-        .required()
-        .messages({
-            "any.required": "Не указан телефон",
-        }),
+      .required()
+      .messages({
+        'any.required': 'Не указан телефон',
+      }),
     address: Joi.string()
-        .required()
-        .messages({
-            "any.required": "Не указан адрес",
-        }),
+      .required()
+      .messages({
+        'any.required': 'Не указан адрес',
+      }),
     total: Joi.number()
-        .required()
-        .messages({
-            "any.required": "Не указана сумма заказа",
-        }),
-})
+      .required()
+      .messages({
+        'any.required': 'Не указана сумма заказа',
+      }),
+  }),
 
-  })
+});

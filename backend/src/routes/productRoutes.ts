@@ -1,19 +1,9 @@
-import { Router } from "express";
-import {
-  getAllProducts,
-  createProduct,
-} from "../controllers/productController";
+import { Router } from 'express';
+import productController from '../controllers/productController'; // Импортируем объект контроллера
 import { productValidation } from '../middlewares/validation';
 
-
 const productRoutes = Router();
-productRoutes.get("/product", getAllProducts);
-productRoutes.post("/product", productValidation, createProduct);
+productRoutes.get('/', productController.getAllProducts); // Используем getAllProducts из объекта контроллера
+productRoutes.post('/', productValidation, productController.createProduct); // Используем createProduct
 
 export default productRoutes;
-
-
-
-
-
-
